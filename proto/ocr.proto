@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package ocr;
+
+// Simple ping test to verify client-server connection
+service OcrService {
+  rpc Ping(Empty) returns (Pong);
+}
+
+message Empty {}
+
+message Pong {
+  string message = 1;
+}
+
