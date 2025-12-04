@@ -6,6 +6,14 @@
 CMakeCache.txt
 CMakeFiles/
 
+client/generated/
+server/generated/
+*.pb.cc
+*.pb.h
+*.grpc.pb.cc
+*.grpc.pb.h
+
+
 # Binaries
 *.o
 *.obj
