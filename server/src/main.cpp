@@ -7,17 +7,26 @@
 
 class OcrServiceImpl final : public ocr::OcrService::Service {
 public:
-    grpc::Status Ping(grpc::ServerContext* context,
-                      const ocr::Empty* request,
-                      ocr::Pong* response) override {
-        std::cout << "Ping received from client." << std::endl;
-        response->set_message("Hello from server!");
+    grpc::Status ProcessImage(grpc::ServerContext* context,
+                              const ocr::ImageRequest* request,
+                              ocr::ImageResult* response) override {
+        std::cout << "Received image: batch=" << request->batch_id()
+                  << " id=" << request->image_id()
+                  << " size=" << request->image_data().size() << " bytes\n";
+
+        // TODO: later: call Tesseract here.
+        std::string fakeText = "[dummy OCR text for " + request->image_id() + "]";
+
+        response->set_batch_id(request->batch_id());
+        response->set_image_id(request->image_id());
+        response->set_text(fakeText);
+
         return grpc::Status::OK;
     }
 };
 
 int main() {
-    std::string server_address("0.0.0.0:50051"); // listen on all interfaces, port 50051
+    std::string server_address("0.0.0.0:50051");
 
     OcrServiceImpl service;
 
@@ -28,6 +37,6 @@ int main() {
     std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
     std::cout << "Server listening on " << server_address << std::endl;
 
-    server->Wait(); // block and wait for requests
+    server->Wait();
     return 0;
 }

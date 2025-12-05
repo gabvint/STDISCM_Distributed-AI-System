@@ -2,14 +2,19 @@ syntax = "proto3";
 
 package ocr;
 
-// Simple ping test to verify client-server connection
 service OcrService {
-  rpc Ping(Empty) returns (Pong);
+  // One image in, one OCR result out
+  rpc ProcessImage (ImageRequest) returns (ImageResult);
 }
 
-message Empty {}
-
-message Pong {
-  string message = 1;
+message ImageRequest {
+  string batch_id = 1;   // which batch this image belongs to
+  string image_id = 2;   // client-side id so you can map results
+  bytes  image_data = 3; // raw bytes of the image
 }
 
+message ImageResult {
+  string batch_id = 1;
+  string image_id = 2;
+  string text     = 3;   // OCR result
+}
