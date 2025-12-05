@@ -1,30 +1,37 @@
 #include <iostream>
 #include <memory>
+#include <string>
 
 #include <grpcpp/grpcpp.h>
 #include "ocr.grpc.pb.h"
 
 int main() {
-    // TODO: change this later to your partner's IP (e.g., "192.168.1.23:50051")
+    // For cross-device, replace "localhost" with your partner's IP: "192.168.xxx.xxx:50051"
     std::string server_address("localhost:50051");
 
-    // Create gRPC channel
     auto channel = grpc::CreateChannel(server_address, grpc::InsecureChannelCredentials());
     std::unique_ptr<ocr::OcrService::Stub> stub = ocr::OcrService::NewStub(channel);
 
-    // Prepare request/response and context
-    ocr::Empty request;
-    ocr::Pong response;
+    // Build a dummy ImageRequest for now
+    ocr::ImageRequest request;
+    request.set_batch_id("batch-1");
+    request.set_image_id("img-1");
+    request.set_image_data("DUMMY_IMAGE_BYTES");  // later: real file bytes
+
+    ocr::ImageResult response;
     grpc::ClientContext context;
 
-    // Call the Ping RPC
-    grpc::Status status = stub->Ping(&context, request, &response);
+    grpc::Status status = stub->ProcessImage(&context, request, &response);
 
     if (status.ok()) {
-        std::cout << "Ping response from server: " << response.message() << std::endl;
+        std::cout << "ProcessImage OK\n";
+        std::cout << "Batch: " << response.batch_id()
+                  << ", Image: " << response.image_id()
+                  << "\nText: " << response.text() << std::endl;
     } else {
-        std::cerr << "Ping RPC failed: " << status.error_code()
-                  << " - " << status.error_message() << std::endl;
+        std::cerr << "ProcessImage RPC failed: "
+                  << status.error_code() << " - "
+                  << status.error_message() << std::endl;
     }
 
     return 0;
